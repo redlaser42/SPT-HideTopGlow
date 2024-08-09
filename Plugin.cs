@@ -1,40 +1,30 @@
-﻿using BepInEx;
-using Comfort.Common;
-using EFT.UI;
+using BepInEx;
+using BepInEx.Logging;
 using System;
-using System.Reflection;
-using UnityEngine;
-using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EFT.UI;
+using HideTopGlow.Patches;
 
 namespace HideTopGlow
 {
-    [BepInPlugin("red.HideTopGlow", "HideTopGlow", "1.0.0")]
+    //first string below is your plugin's GUID, it MUST be unique to any other mod. Read more about it in BepInEx docs. Be sure to update it if you copy this code.
+    [BepInPlugin("redlaser42.HideTopGlow", "HideTopGlow", "1.1.0")]  
     public class Plugin : BaseUnityPlugin
     {
-        private void Awake()
+        public static ManualLogSource LogSource;
+
+        //BaseUnityPlugin inherits MonoBehaviour, so you can use base unity functions like Awake() and Update()
+        private void Awake() //Awake() will run once when your plugin loads
         {
-            Logger.LogInfo($"HideTopGlow is loaded!");
-        }
+            //we save the Logger to our LogSource variable so we can use it anywhere, such as in our patches via Plugin.LogSource.LogInfo(), etc.
+            LogSource = Logger;
+            LogSource.LogInfo("HideTopGlow loaded!");
 
-        private void OnDestroy()
-        {
-            Logger.LogInfo($"HideTopGlow is unloaded!");
-        }
-
-        void FixedUpdate()
-        {
-            HideTopGlow();
-        }
-
-        private void HideTopGlow()
-        {
-            if (Singleton<EnvironmentUI>.Instance == null) return;
-            EnvironmentUI EnvironmentUI = Singleton<EnvironmentUI>.Instance;
-
-            var field = typeof(EnvironmentUI).GetField("_topGlowRegularImage", BindingFlags.NonPublic | BindingFlags.Instance);
-            var e = field.GetValue(EnvironmentUI) as Image;
-
-            e.enabled = false;
+            //uncomment the line below and replace "PatchClassName" with the class name you gave your patch. Patches must be enabled like this to work.
+            new HideTopGlowPatch().Enable();
         }
     }
 }
